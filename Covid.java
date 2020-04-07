@@ -88,7 +88,7 @@ public class Covid {
       }
       */
 
-      System.out.println("reverse,complement,junk,length,fileA,startA,endA,textA,fileB,startB,endB,textB");
+      System.out.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
       System.err.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
 
       //String files[] = {covi1,covi2,covi3,covi4,covi5,covi6,covi7,
