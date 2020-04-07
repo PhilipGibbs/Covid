@@ -89,7 +89,7 @@ public class Covid {
       */
 
       System.out.println("reverse,complement,junk,length,fileA,startA,endA,textA,fileB,startB,endB,textB");
-      System.err.println("reverse,complement,junk,length,fileA,startA,endA,textA,fileB,startB,endB,textB");
+      System.err.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
 
       //String files[] = {covi1,covi2,covi3,covi4,covi5,covi6,covi7,
       //                  covi8,covi9,covi10,covi11,covi12,covi13,covi14};
@@ -104,7 +104,8 @@ public class Covid {
       //comparei(files,trans2);
       //comparef("coronavirus",bieti3);
       //comparef("coronavirus",macaca);
-      comparef("coronavirus",bieti3);
+      //comparef("coronavirus",bieti3);
+      comparef("coronavirus","coronavirus/pangolin_MT084071.1.txt");
 
       /*
       String B = readgenome(trans1);
@@ -124,7 +125,7 @@ public class Covid {
 
    public static void comparef(String foldername, String fileB) {
 
-      String B = readgenome(fileB);
+      String B = strip(readgenome(fileB));
 
       makeindex(B);
 
@@ -132,12 +133,14 @@ public class Covid {
       String[] files = folder.list();
 
       for(int f=0; f<files.length; f++) {
-         String A = readgenome(folder+"/"+files[f]).toUpperCase();
+         if(!(folder+"/"+files[f]).equals(fileB)) {
+            String A = readgenome(folder+"/"+files[f]).toUpperCase();
 
-         matchi(false, false, A, B, files[f], fileB);
-         matchi(false, true,  A, B, files[f], fileB);
-         matchi(true,  false, A, B, files[f], fileB);
-         matchi(true,  true,  A, B, files[f], fileB);
+            matchi(false, false, A, B, files[f], fileB);
+            matchi(false, true,  A, B, files[f], fileB);
+            matchi(true,  false, A, B, files[f], fileB);
+            matchi(true,  true,  A, B, files[f], fileB);
+         }
       }
    }
 
@@ -166,7 +169,7 @@ public class Covid {
 
    public static void comparei(String files[], String fileB) {
 
-      String B = readgenome(fileB);
+      String B = strip(readgenome(fileB));
 
       makeindex(B);
 
@@ -191,12 +194,15 @@ public class Covid {
      int n = 15;   // must be at least nnt
 
      int ilast = 0;
-     for(int k=0; k<T.length()-n; k++) {
-      String text = T.substring(k,k+n);
+     int h = 0;
+     for(int k=0; k<T.length()-n-h; k++) {
+      String text = T.substring(k,k+n+h);
       if(text.indexOf("NNNNNNNNNN") == -1) {
         int i = indexOf(text,B);
-        if(i > -1) {
-           int h = 0;
+        if(i == -1) {
+           h--;
+           if(h < 0) h = 0;
+        } else {
            int j = i;
            String text1 = text;
            while (j > -1) {
@@ -228,7 +234,7 @@ public class Covid {
                     iend = T.length()+1-istart;
                     istart = ist;
                  }
-                 String line = reverse+","+complement+","+junk+","+(n+h-1)+","+fileA+","+istart+","+iend+","+textT+","+fileB+","+(i+1)+","+(i+n+h-1)+","+textB;
+                 String line = reverse+","+complement+","+junk+","+(n+h-1)+","+fileA+","+A.length()+","+istart+","+iend+","+textT+","+fileB+","+B.length()+","+(i+1)+","+(i+n+h-1)+","+textB;
                  System.out.println(line);
                  System.err.println(line);
               }
