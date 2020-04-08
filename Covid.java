@@ -88,34 +88,71 @@ public class Covid {
       }
       */
 
-      System.out.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
-      System.err.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
+      //System.out.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
+      //System.err.println("reverse,complement,junk,length,fileA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
 
-      //String files[] = {covi1,covi2,covi3,covi4,covi5,covi6,covi7,
-      //                  covi8,covi9,covi10,covi11,covi12,covi13,covi14};
+ 
+      //comparef("coronavirus","coronavirus/pangolin_MT084071.1.txt");
 
-      String files[] = {file1,file2,file3,file4,file7,file12,file15,file16,
-                        file17,file18,file19,file20,file21,file22,file23,file24};
+      // *****************************************************
 
-      //comparei(covi15,file13);
-      //comparei(covi15,file14);
-      //comparei(file14,file13);
+      //System.out.println("reverse,complement,junk,length,idA,titelA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
+      //System.err.println("reverse,complement,junk,length,idA,titleA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
 
-      //comparei(files,trans2);
-      //comparef("coronavirus",bieti3);
-      //comparef("coronavirus",macaca);
-      //comparef("coronavirus",bieti3);
-      comparef("coronavirus","coronavirus/pangolin_MT084071.1.txt");
+      sequences("sequences/sequences.fasta", file1);
 
-      /*
-      String B = readgenome(trans1);
+   }
+
+   public static void sequences(String fileS, String fileB) {
+
+      String B = strip(readgenome(fileB));
+
       makeindex(B);
 
-      matchi(true,true, "GAGAATTCATTCTGCACAA", B, "A", "B");
-      matchi(true,true, "TTGTGCAGAATGAATTCTC", B, "A", "B");
-      match("TTGTGCAGAATGAATTCTC", B);
-      match("GAGAATTCATTCTGCACAA", B);
-      */
+      StringBuffer buffer = new StringBuffer("");
+
+      try { 
+         BufferedReader br = new BufferedReader(new FileReader(fileS));
+
+         String line = "";
+         String id = null;
+         String title = "";
+         boolean more = true;
+         while(more) {
+            line = br.readLine();
+            if(line == null || line.startsWith(">")) {
+               //System.err.println(line); 
+               if(id != null) {
+                  String A = buffer.toString();
+                  System.err.println(id+","+title+","+A.length());
+                  String fileA = id+","+title;
+                  matchi(false, false, A, B, fileA, fileB);
+                  matchi(false, true,  A, B, fileA, fileB);
+                  matchi(true,  false, A, B, fileA, fileB);
+                  matchi(true,  true,  A, B, fileA, fileB);
+               }
+               if(line != null) {
+                  int i = line.indexOf("|");
+                  id = line.substring(1,i).trim();
+                  title = line.substring(i+1).trim();
+                  i = title.indexOf("|");
+                  if(i > -1) title = title.substring(0,i);
+                  buffer = new StringBuffer("");
+               } else {
+                  more = false;
+               }
+            } else {
+               buffer.append(line);
+            }
+         }
+
+         br.close();
+        
+
+     } catch (IOException ioe) { 
+            System.out.println(ioe);
+     } 
+
    }
 
    public static void comparei(String fileA, String fileB) {
