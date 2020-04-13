@@ -142,12 +142,13 @@ public class Covid {
                   if(i == -1) i = line.indexOf(" ");
                   if(i == -1) i = line.indexOf(",");
                   id = "";
-                  title = line;
+                  title = line.replaceAll(","," ");
                   if(i > -1) {
-                     id = line.substring(1,i).trim();
-                     title = line.substring(i+1).trim();
+                     id = line.substring(1,i).replaceAll(","," ").trim();
+                     title = line.substring(i+1).replaceAll(","," ").trim();
                      i = title.indexOf("|");
                      if(i > -1) title = title.substring(0,i);
+
                   }
                   buffer = new StringBuffer("");
                   System.out.flush();
