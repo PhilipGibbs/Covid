@@ -12,7 +12,7 @@ public class Covid {
 
    public static int nnt = 10;
    public static int nword = 1 << (nnt*2);
-   public static Vector ntindex[] = new Vector[nword];
+   public static Vector ntindex[] = null;
 
    public static void main(String[] args) {
 
@@ -78,7 +78,7 @@ public class Covid {
       String covi14 = "Sars-Cov-2/20200311-MT192765.1.txt";
       String covi15 = "Sars-Cov-2/20200210-LC528232.1.txt";
 
-      //comparei(file1,bieti2);
+      //comparei("test/shipp.txt","test/ratg_pangolin.txt");
 
       /*
       for(int i=0; i<23; i++) {
@@ -96,10 +96,10 @@ public class Covid {
 
       // *****************************************************
 
-      //System.out.println("reverse,complement,junk,length,idA,titelA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
+      System.out.println("reverse,complement,junk,length,idA,titelA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
       //System.err.println("reverse,complement,junk,length,idA,titleA,lengthA,startA,endA,textA,fileB,lengthB,startB,endB,textB");
 
-      sequences("sequences/sequences.fasta", file1);
+      sequences("Human/GCF_000001405.39_GRCh38.p13_rna.fna", "Sars-Cov-2/20191226-LR757995.1.txt");
 
    }
 
@@ -118,26 +118,39 @@ public class Covid {
          String id = null;
          String title = "";
          boolean more = true;
+         int k=0;
          while(more) {
             line = br.readLine();
+            k++;
+            //if(k%1000000 == 0) System.err.println("line "+k);
             if(line == null || line.startsWith(">")) {
                //System.err.println(line); 
                if(id != null) {
                   String A = buffer.toString();
-                  System.err.println(id+","+title+","+A.length());
                   String fileA = id+","+title;
-                  matchi(false, false, A, B, fileA, fileB);
-                  matchi(false, true,  A, B, fileA, fileB);
-                  matchi(true,  false, A, B, fileA, fileB);
-                  matchi(true,  true,  A, B, fileA, fileB);
+                  int nmatch = matchi(false, false, A, B, fileA, fileB);
+                  nmatch += matchi(false, true,  A, B, fileA, fileB);
+                  nmatch += matchi(true,  false, A, B, fileA, fileB);
+                  nmatch += matchi(true,  true,  A, B, fileA, fileB);
+                  if(nmatch > 0) {
+                     System.err.println(id+","+title+","+A.length()+","+nmatch+",line = "+k);
+                     //System.out.println(id+","+title+","+A.length()+","+nmatch);
+                  }
                }
                if(line != null) {
                   int i = line.indexOf("|");
-                  id = line.substring(1,i).trim();
-                  title = line.substring(i+1).trim();
-                  i = title.indexOf("|");
-                  if(i > -1) title = title.substring(0,i);
+                  if(i == -1) i = line.indexOf(" ");
+                  if(i == -1) i = line.indexOf(",");
+                  id = "";
+                  title = line;
+                  if(i > -1) {
+                     id = line.substring(1,i).trim();
+                     title = line.substring(i+1).trim();
+                     i = title.indexOf("|");
+                     if(i > -1) title = title.substring(0,i);
+                  }
                   buffer = new StringBuffer("");
+                  System.out.flush();
                } else {
                   more = false;
                }
@@ -220,7 +233,7 @@ public class Covid {
       }
    }
 
-   public static void matchi(boolean reverse, boolean complement, String A, String B, String fileA, String fileB) {
+   public static int matchi(boolean reverse, boolean complement, String A, String B, String fileA, String fileB) {
 
      String T = strip(A);
      if(reverse) T = reverse(T);
@@ -228,7 +241,9 @@ public class Covid {
 
      // must index B before using this version
 
-     int n = 15;   // must be at least nnt
+     int n = 16;   // must be at least nnt
+
+     int nmatch = 0;
 
      int ilast = 0;
      int h = 0;
@@ -272,8 +287,9 @@ public class Covid {
                     istart = ist;
                  }
                  String line = reverse+","+complement+","+junk+","+(n+h-1)+","+fileA+","+A.length()+","+istart+","+iend+","+textT+","+fileB+","+B.length()+","+(i+1)+","+(i+n+h-1)+","+textB;
-                 System.out.println(line);
-                 System.err.println(line);
+                 if(!junk) System.out.println(line);
+                 //System.err.println(line);
+                 nmatch += (n+h-1);
               }
            }
            ilast = k+n+h;
@@ -282,6 +298,7 @@ public class Covid {
       }
      }
 
+     return nmatch;
    }
 
    public static String strip(String A) {
@@ -304,6 +321,8 @@ public class Covid {
    public static int indexOf(String text, String genome) { 
       // index of genome must be made before using this function
 
+      if(ntindex == null) return(genome.indexOf(text));
+
       int n = text.length();
       String word = text.substring(0,nnt).toUpperCase();
       int w = wordtoint(word);
@@ -319,6 +338,7 @@ public class Covid {
 
    public static void makeindex(String text) {
 
+      ntindex = new Vector[nword];
       for(int w=0; w<nword; w++) ntindex[w] = new Vector();
 
       for(int i=0; i<text.length()-nnt+1; i++) {
